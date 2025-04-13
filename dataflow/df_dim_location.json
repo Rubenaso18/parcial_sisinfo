@@ -1,0 +1,88 @@
+{
+	"name": "df_dim_location",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Airbnb_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dim_location",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          City as string,",
+				"          Price as string,",
+				"          Day as string,",
+				"          {Room Type} as string,",
+				"          {Shared Room} as string,",
+				"          {Private Room} as string,",
+				"          {Person Capacity} as string,",
+				"          Superhost as string,",
+				"          {Multiple Rooms} as string,",
+				"          Business as string,",
+				"          {Cleanliness Rating} as string,",
+				"          {Guest Satisfaction} as string,",
+				"          Bedrooms as string,",
+				"          {City Center (km)} as string,",
+				"          {Metro Distance (km)} as string,",
+				"          {Attraction Index} as string,",
+				"          {Normalised Attraction Index} as string,",
+				"          {Restraunt Index} as string,",
+				"          {Normalised Restraunt Index} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          {City Center (km)},",
+				"          {Metro Distance (km)}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sort(asc({Metro Distance (km)}, true),",
+				"     asc({City Center (km)}, true)) ~> sort1",
+				"sort1 aggregate(groupBy({City Center (km)}),",
+				"     each(match(name != 'City Center (km)'), $$ = first ($$))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOCATION_ID as integer,",
+				"          CITY_CENTER_KM as decimal(3,3),",
+				"          METRO_DISTANCE_KM as decimal(3,3)",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
