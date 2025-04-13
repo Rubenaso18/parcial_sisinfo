@@ -65,12 +65,9 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1 sort(asc(City, true),",
-				"     asc(Price, true),",
-				"     asc(Day, true),",
-				"     asc({Room Type}, true)) ~> sort1",
+				"select1 sort(asc(City, true)) ~> sort1",
 				"sort1 aggregate(groupBy(City),",
-				"     each(match(name != 'City'), $$ = first ($$))) ~> aggregate1",
+				"     each(match(name!='City'), $$ = first ($$))) ~> aggregate1",
 				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -91,7 +88,9 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          CITY = City",
+				"          PRICE = Price,",
+				"          CITY = City,",
+				"          DAY_NAME = Day",
 				"     )) ~> sink1"
 			]
 		}
