@@ -773,8 +773,7 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sort(asc({Metro Distance (km)}, true),",
-						"     asc({City Center (km)}, true)) ~> sort1",
+						"select1 sort(asc({City Center (km)}, true)) ~> sort1",
 						"sort1 aggregate(groupBy({City Center (km)}),",
 						"     each(match(name!='City Center (km)'), $$ = first ($$))) ~> aggregate1",
 						"aggregate1 sink(allowSchemaDrift: true,",
@@ -791,7 +790,11 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          CITY_CENTER_KM = {City Center (km)},",
+						"          METRO_DISTANCE_KM = {Metro Distance (km)}",
+						"     )) ~> sink1"
 					]
 				}
 			},
@@ -1241,52 +1244,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "df_dim_day",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_dim_day')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pipeline_dim_city')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1330,6 +1287,52 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_dim_city')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_dim_day')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_dim_day",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_dim_day')]"
 			]
 		},
 		{
@@ -1379,7 +1382,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline_dim_room_type')]",
+			"name": "[concat(parameters('factoryName'), '/pipeline_dim_location')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1398,7 +1401,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "df_dim_room_type",
+								"referenceName": "df_dim_location",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -1421,7 +1424,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_dim_room_type')]"
+				"[concat(variables('factoryId'), '/dataflows/df_dim_location')]"
 			]
 		}
 	]
