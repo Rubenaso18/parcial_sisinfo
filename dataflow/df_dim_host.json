@@ -1,0 +1,94 @@
+{
+	"name": "df_dim_host",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Airbnb_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dim_host",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          City as string,",
+				"          Price as string,",
+				"          Day as string,",
+				"          {Room Type} as string,",
+				"          {Shared Room} as string,",
+				"          {Private Room} as string,",
+				"          {Person Capacity} as string,",
+				"          Superhost as string,",
+				"          {Multiple Rooms} as string,",
+				"          Business as string,",
+				"          {Cleanliness Rating} as string,",
+				"          {Guest Satisfaction} as string,",
+				"          Bedrooms as string,",
+				"          {City Center (km)} as string,",
+				"          {Metro Distance (km)} as string,",
+				"          {Attraction Index} as string,",
+				"          {Normalised Attraction Index} as string,",
+				"          {Restraunt Index} as string,",
+				"          {Normalised Restraunt Index} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          Superhost,",
+				"          {Multiple Rooms},",
+				"          Business",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sort(asc(Superhost, true)) ~> sort1",
+				"sort1 aggregate(groupBy(Superhost),",
+				"     each(match(name != 'Superhost'), $$ = first($$))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          HOST_ID as integer,",
+				"          SUPERHOST as boolean,",
+				"          MULTIPLE_ROOMS as boolean,",
+				"          BUSINESS as boolean",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          SUPERHOST = Superhost,",
+				"          MULTIPLE_ROOMS = {Multiple Rooms},",
+				"          BUSINESS = Business",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
