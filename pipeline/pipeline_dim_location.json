@@ -1,5 +1,5 @@
 {
-	"name": "pipeline_dim_day",
+	"name": "pipeline_dim_location",
 	"properties": {
 		"activities": [
 			{
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_dim_day",
+						"referenceName": "df_dim_location",
 						"type": "DataFlowReference"
 					},
 					"compute": {
