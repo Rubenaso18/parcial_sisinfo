@@ -33,41 +33,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/Airbnb')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('Airbnb_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dw_Airbnb')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('dw_Airbnb_properties_typeProperties_server')]",
-					"database": "[parameters('dw_Airbnb_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('dw_Airbnb_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('dw_Airbnb_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Airbnb_csv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -205,7 +170,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dim_room_type')]",
+			"name": "[concat(parameters('factoryName'), '/dim_day')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -220,28 +185,13 @@
 				"type": "AzureSqlTable",
 				"schema": [
 					{
-						"name": "ROOM_TYPE_ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ROOM_TYPE",
+						"name": "DAY_NAME",
 						"type": "varchar"
-					},
-					{
-						"name": "PERSON_CAPACITY",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BEDROOMS",
-						"type": "int",
-						"precision": 10
 					}
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "DIM_ROOM_TYPE"
+					"table": "DIM_DAY"
 				}
 			},
 			"dependsOn": [
@@ -289,6 +239,127 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dw_Airbnb')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dim_location')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dw_Airbnb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Dw"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "LOCATION_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CITY_CENTER_KM",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 3
+					},
+					{
+						"name": "METRO_DISTANCE_KM",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM_LOCATION"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dw_Airbnb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dim_room_type')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dw_Airbnb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Dw"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ROOM_TYPE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ROOM_TYPE",
+						"type": "varchar"
+					},
+					{
+						"name": "PERSON_CAPACITY",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BEDROOMS",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM_ROOM_TYPE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dw_Airbnb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Airbnb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Airbnb_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_Airbnb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('dw_Airbnb_properties_typeProperties_server')]",
+					"database": "[parameters('dw_Airbnb_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('dw_Airbnb_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('dw_Airbnb_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
