@@ -360,6 +360,65 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dw_Airbnb')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/hechos_airbnb')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dw_Airbnb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Dw"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "HECHOS_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PRICE",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "CITY",
+						"type": "varchar"
+					},
+					{
+						"name": "DAY_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "ROOM_TYPE_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "HOST_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "LOCATION_ID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "HECHOS_AIRBNB"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dw_Airbnb')]"
+			]
 		}
 	]
 }
